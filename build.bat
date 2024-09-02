@@ -1,6 +1,6 @@
 @echo off
 
-SET "START_PROJ=Test"
+SET "START_PROJ=test"
 
 REM Set the path to the Visual Studio generator
 SET "generator=Visual Studio 17 2022"

@@ -4,12 +4,12 @@ project(Physics)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_BUILD_TYPE Debug)
 
-set(DEPS_INCLUDE_DIRS
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps
-    ${CMAKE_CURRENT_SOURCE_DIR}/deps/glm
-)
+add_subdirectory(deps/glm)
 
-include_directories(${DEPS_INCLUDE_DIRS})
+set(SDL_STATIC ON)
+set(BUILD_SHARED_LIBS OFF)
+add_subdirectory(deps/SDL2)
 
-add_subdirectory(AtomixPhysics)
-add_subdirectory(Test)
+add_subdirectory(PurrPhysics)
+
+add_subdirectory(test)

@@ -1,28 +1,19 @@
-project(Test)
+cmake_minimum_required(VERSION 3.10)
 
-set(CMAKE_CXX_COMPILER g++)
-set(CMAKE_CXX_STANDARD 11)
+project(test)
 
-file(GLOB_RECURSE TEST_SOURCES "src/*.cpp" "src/**/*.cpp")
-add_executable(Test ${TEST_SOURCES})
+file(GLOB_RECURSE TEST_SOURCES "*.cpp")
 
-target_include_directories(Test PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/include
-)
+include_directories(deps/SDL2/include)
 
-target_include_directories(Test PUBLIC ${DEPS_INCLUDE_DIRS})
+add_executable(test ${TEST_SOURCES})
 
-target_link_libraries(Test PRIVATE
-    AtomixPhysics
-)
+target_link_libraries(test PRIVATE PurrPhysics SDL2-static)
 
+target_include_directories(test PRIVATE ${CMAKE_SOURCE_DIR}/PurrPhysics/include)
 
-target_compile_definitions(Test PRIVATE
-    $<$<CONFIG:Debug>:DEBUG>
-    $<$<CONFIG:Release>:NDEBUG>
-)
-
-target_compile_options(Test PRIVATE
-    $<$<CONFIG:Debug>:-g>
-    $<$<CONFIG:Release>:-O3>
+set_target_properties(test PROPERTIES
+    CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED YES
+    CXX_EXTENSIONS NO
 )
