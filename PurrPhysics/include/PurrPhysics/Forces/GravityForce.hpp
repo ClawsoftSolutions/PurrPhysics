@@ -2,20 +2,22 @@
 #define GRAVITY_FORCE_HPP
 
 #include "../Force.hpp"
-#include "../RigidBody.hpp"
 #include <glm/vec3.hpp>
 
-class GravityForce : public Force {
+template<typename T>
+class GravityForce : public Force<T> {
 public:
     explicit GravityForce(const glm::vec3& gravity) : gravity(gravity) {}
 
-    void apply(RigidBody& body) const override {
-        glm::vec3 force = gravity * body.getMass();
-        body.applyForce(force);
-    }
+    void apply(T& body) const override;
 
 private:
     glm::vec3 gravity;
 };
+
+template<typename T>
+void GravityForce<T>::apply(T& body) const {
+    body.applyForce(gravity * body.getMass());
+}
 
 #endif // GRAVITY_FORCE_HPP

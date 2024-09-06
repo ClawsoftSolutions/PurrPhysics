@@ -9,7 +9,10 @@ struct CollisionManifold {
     float penetrationDepth;
 };
 
-CollisionManifold checkCollision(const RigidBody& a, const RigidBody& b);
-void resolveCollision(RigidBody& a, RigidBody& b, const CollisionManifold& manifold);
+CollisionManifold checkCollision(const RigidBodyComponent& a, const RigidBodyComponent& b);
+void resolveCollision(RigidBodyComponent& a, RigidBodyComponent& b, const CollisionManifold& manifold);
+
+void resolveGroundCollision(RigidBodyComponent& body, const CollisionManifold& manifold);
+CollisionManifold checkGroundCollision(const RigidBodyComponent& body, float GROUND_Y);
 
 #endif

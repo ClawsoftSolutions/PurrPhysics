@@ -1,13 +1,11 @@
 #ifndef FORCE_HPP
 #define FORCE_HPP
 
-#include "RigidBody.hpp"
-
+template<typename T>
 class Force {
 public:
-    virtual ~Force() {}
-    virtual void apply(RigidBody& body) const = 0;
+    virtual void apply(T& body) const = 0;
+    virtual ~Force() = default;
 };
 
-
-#endif
+#endif // FORCE_HPP

@@ -1,48 +1,71 @@
-#include "PurrPhysics/RigidBody.hpp"
+#include "PurrPhysics/Rigidbody.hpp"
+#include "PurrPhysics/TransformData.hpp"
 
-RigidBody::RigidBody(float mass, const glm::vec3& position, glm::vec3 halfSize)
-    : mass(mass), position(position), velocity(0.0f), acceleration(0.0f), forceAccumulator(0.0f),
-      orientation(glm::quat(1.0f, 0.0f, 0.0f, 0.0f)), angularVelocity(0.0f), torqueAccumulator(0.0f), halfSize(halfSize) {
-    inverseMass = (mass != 0.0f) ? 1.0f / mass : 0.0f;
+RigidBodyComponent::RigidBodyComponent(float mass, const glm::vec3& position, const glm::vec3& halfSize)
+    : mass(mass), position(position), halfSize(halfSize), velocity(0.0f), force(0.0f) {
+    transformData = TransformData();
 }
 
-void RigidBody::applyForce(const glm::vec3& force) {
-    forceAccumulator += force;
+void RigidBodyComponent::applyForce(const glm::vec3& force) {
+    this->force += force;
 }
 
-void RigidBody::applyForceToCenter(const glm::vec3& force) {
-    applyForce(force);
+void RigidBodyComponent::integrateForces(float deltaTime) {
+    if (mass > 0.0f) {
+        velocity += force * (deltaTime / mass);
+    }
+    clearForces();
 }
 
-void RigidBody::applyTorque(const glm::vec3& torque) {
-    torqueAccumulator += torque;
-}
-
-void RigidBody::integrateForces(float deltaTime) {
-    if (inverseMass == 0.0f) return;
-    acceleration = forceAccumulator * inverseMass;
-    velocity += acceleration * deltaTime;
-
-    glm::vec3 angularAcceleration = torqueAccumulator * inverseMass;
-    angularVelocity += angularAcceleration * deltaTime;
-
-    clearAccumulators();
-}
-
-void RigidBody::integrate(float deltaTime) {
-    if (inverseMass == 0.0f) return;
+void RigidBodyComponent::integrate(float deltaTime) {
     position += velocity * deltaTime;
-
-    glm::quat deltaOrientation = glm::quat(0.0f, angularVelocity * deltaTime);
-    orientation = glm::normalize(orientation + 0.5f * deltaOrientation * orientation);
-
-    clearAccumulators();
+    for (auto& point : points) {
+        point.position += velocity * deltaTime;
+    }
+    transformData.setPosition(position);
 }
 
-void RigidBody::clearAccumulators() {
-    forceAccumulator = glm::vec3(0.0f);
-    torqueAccumulator = glm::vec3(0.0f);
+void RigidBodyComponent::clearForces() {
+    force = glm::vec3(0.0f);
 }
 
-glm::vec3 RigidBody::getMin() const { return position - halfSize; }
-glm::vec3 RigidBody::getMax() const { return position + halfSize; }
+float RigidBodyComponent::getMass() const {
+    return mass;
+}
+
+const glm::vec3& RigidBodyComponent::getPosition() const {
+    return position;
+}
+
+const glm::vec3& RigidBodyComponent::getHalfSize() const {
+    return halfSize;
+}
+
+const glm::vec3& RigidBodyComponent::getVelocity() const {
+    return velocity;
+}
+
+void RigidBodyComponent::setMass(float mass) {
+    this->mass = mass;
+}
+
+void RigidBodyComponent::setPosition(const glm::vec3& position) {
+    this->position = position;
+    transformData.setPosition(position);
+}
+
+void RigidBodyComponent::setVelocity(const glm::vec3& velocity) {
+    this->velocity = velocity;
+}
+
+void RigidBodyComponent::addPoint(const glm::vec3& position) {
+    points.emplace_back(position);
+}
+
+const std::vector<Point>& RigidBodyComponent::getPoints() const {
+    return points;
+}
+
+const TransformData& RigidBodyComponent::getTransformData() const {
+    return transformData;
+}

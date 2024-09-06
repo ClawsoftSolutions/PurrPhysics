@@ -1,29 +1,25 @@
 #include "PurrPhysics/PurrPhysics.hpp"
-#include "PurrPhysics/Collision.hpp"
 
-void applyForces(std::vector<RigidBody>& bodies, const std::vector<const Force*>& forces) {
-    for (RigidBody& body : bodies) {
-        for (const Force* force : forces) {
-            force->apply(body);
-        }
+
+#include "PurrPhysics/TransformData.hpp"
+#include <algorithm>
+
+
+void purrPhysics::addRigidBody(RigidBodyComponent& body) {
+    rigidBodies.push_back(&body);
+}
+
+void purrPhysics::removeRigidBody(RigidBodyComponent& body) {
+    auto it = std::find(rigidBodies.begin(), rigidBodies.end(), &body);
+    if (it != rigidBodies.end()) {
+        rigidBodies.erase(it);
     }
 }
 
-void updatePhysics(std::vector<RigidBody>& bodies, const std::vector<const Force*>& forces, float deltaTime) {
-    applyForces(bodies, forces);
-
-    for (RigidBody& body : bodies) {
-        body.integrateForces(deltaTime);
-        body.integrate(deltaTime);
-    
-        for (size_t i = 0; i < bodies.size(); ++i) {
-            for (size_t j = i + 1; j < bodies.size(); ++j) {
-                CollisionManifold manifold = checkCollision(bodies[i], bodies[j]);
-                resolveCollision(bodies[i], bodies[j], manifold);
-            }
-        }
-        for (RigidBody& body : bodies) {
-            body.clearAccumulators();
-        }
+void purrPhysics::updatePhysics(float deltaTime) {
+    for (auto body : rigidBodies) {
+        body->integrateForces(deltaTime);
+        body->integrate(deltaTime);
     }
+
 }
